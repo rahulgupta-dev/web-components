@@ -1,0 +1,123 @@
+.mep-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  cursor: pointer;
+  input {
+    height: 30px;
+    border: 1px solid #dde2eb;
+    border-radius: 4px;
+    outline: none;
+    padding-left: 5px;
+    width: 200px;
+    font-size: 13px;
+  }
+  label {
+    position: absolute;
+    font-size: 11px;
+    top: -7px;
+    left: 5px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    color: black;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    background: white;
+    padding: 0 5px;
+  }
+  .mep-checkbox__original,
+  .mep-radio__original {
+    opacity: 0;
+    outline: none;
+    position: absolute;
+    margin: 0;
+    width: 0;
+    height: 0;
+    z-index: -1;
+  }
+
+  .mep-checkbox__input {
+    white-space: nowrap;
+    outline: none;
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+    vertical-align: middle;
+    &.is-checked {
+      .mep-checkbox__inner {
+        &:after {
+          transform: rotate(45deg) scaleY(1);
+        }
+      }
+    }
+    .mep-checkbox__inner {
+      display: inline-block;
+      position: relative;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      box-sizing: border-box;
+      width: 14px;
+      height: 14px;
+      background-color: #fff;
+      z-index: 1;
+      transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46),
+        background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
+      &:after {
+        box-sizing: content-box;
+        content: "";
+        border: 1px solid #fff;
+        border-left: 0;
+        border-top: 0;
+        height: 7px;
+        left: 4px;
+        position: absolute;
+        top: 1px;
+        transform: rotate(45deg) scaleY(0);
+        width: 3px;
+        transition: transform 0.15s ease-in 0.05s;
+        transform-origin: center;
+      }
+    }
+  }
+  .mep-radio__input {
+    white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+    vertical-align: middle;
+    &.is-checked {
+      .mep-radio__inner {
+        &:after {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+    }
+    .mep-radio__inner {
+      border: 1px solid #dcdfe6;
+      border-radius: 100%;
+      width: 14px;
+      height: 14px;
+      background-color: #fff;
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      box-sizing: border-box;
+      &:after {
+        width: 4px;
+        height: 4px;
+        border-radius: 100%;
+        background-color: #fff;
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.15s ease-in;
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+.mep-operations {
+  &.open {
+    div {
+      ul {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
+
+  .more-btn {
+    background: none;
+    border: 0 none;
+    line-height: normal;
+    overflow: visible;
+    width: 100%;
+    text-align: left;
+    outline: none;
+    cursor: pointer;
+    &:hover {
+      .more-dot {
+        &:first-child {
+          transform: translateX(16px);
+        }
+        &:last-child {
+          transform: translateX(-16px);
+        }
+      }
+    }
+    .more-dot {
+      background-color: #aab8c2;
+      margin: 0 auto;
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 1px;
+      border-radius: 50%;
+      transition: transform 0.5s ease-in-out;
+    }
+  }
+
+  div {
+    gap: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 30px;
+    width: 35px;
+    justify-content: center;
+    align-items: flex-end;
+    ul {
+      transition: opacity 0.5s ease-in-out;
+      position: absolute;
+      opacity: 0;
+      padding: 10px 0;
+      z-index: 99;
+      background-color: white;
+      box-shadow: 0px -2px 4px 0px rgb(0 0 0 / 4%), 0px 4px 6px 0px rgb(31 33 38 / 12%);
+      border-radius: 5px;
+      visibility: hidden;
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        height: 25px;
+        padding: 5px 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        //max-width: 150px;
+        min-width: 150px;
+        gap: 15px;
+        &:hover {
+          background-color: #e7e7e7;
+        }
+      }
+    }
+  }
+}

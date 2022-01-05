@@ -1,0 +1,167 @@
+.mep-date-content {
+  width: 200px;
+  &.with-time {
+    width: 310px;
+  }
+  display: flex;
+  position: relative;
+  input {
+    width: 100%;
+    cursor: pointer;
+    height: 30px;
+    border: 1px solid #dde2eb;
+    border-radius: 4px;
+    padding-right: 20px;
+    outline: none;
+    font-size: 13px;
+    padding-left: 5px;
+  }
+  .clear-icon {
+    position: absolute;
+    cursor: pointer;
+    right: 5px;
+    top: 9px;
+    width: 12px;
+    height: 12px;
+    opacity: 0.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      opacity: 0.5;
+    }
+    &:before,
+    &:after {
+      position: absolute;
+      content: " ";
+      height: 12px;
+      width: 2px;
+      background-color: #333;
+    }
+    &:before {
+      transform: rotate(45deg);
+    }
+    &:after {
+      transform: rotate(-45deg);
+    }
+  }
+  label {
+    position: absolute;
+    font-size: 11px;
+    top: -7px;
+    left: 5px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    color: black;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    background: white;
+    padding: 0 5px;
+  }
+}
+.mep-datepicker {
+  .mep-dates,
+  .mep-week-name {
+    display: grid;
+    grid-template-columns: repeat(7, 35px [col-start]);
+  }
+  display: none;
+  padding: 0.5rem;
+  position: absolute;
+  box-shadow: 0px -2px 4px 0px rgb(0 0 0 / 4%), 0px 4px 6px 0px rgb(31 33 38 / 12%);
+  border-radius: 5px;
+  background: white;
+  z-index: 999;
+  &.show {
+    display: grid;
+    &.is-range {
+      grid-template-columns: 1fr 1fr;
+    }
+    &:not(.is-range) {
+      grid-template-columns: 1fr;
+    }
+  }
+  span {
+    position: relative;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #78909c;
+    display: inline-block;
+    min-height: 20px;
+    min-width: 20px;
+    padding: 6px;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.important {
+      cursor: pointer;
+    }
+    &.disabled {
+      text-decoration: line-through;
+      cursor: not-allowed;
+      color: lightgray;
+    }
+    i {
+      border: 5px solid;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
+  .mep-current-month {
+    display: grid;
+    grid-template-columns: 35px 1fr 35px;
+    align-items: center;
+    .arrow {
+      height: 0;
+      width: 0;
+      display: inline-block;
+      cursor: pointer;
+      border: 6px solid gray;
+      &.left {
+        border-left-color: transparent !important;
+        border-top-color: transparent !important;
+        border-bottom-color: transparent !important;
+      }
+      &.right {
+        border-right-color: transparent !important;
+        border-top-color: transparent !important;
+        border-bottom-color: transparent !important;
+        margin-left: 22px;
+      }
+    }
+  }
+  .time-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .time {
+      display: flex;
+      justify-self: right;
+      align-items: center;
+      * {
+        margin-right: 0.5rem;
+        font-weight: bold;
+        font-size: 0.75rem;
+      }
+      select {
+        width: 45px;
+        color: #78909c;
+        height: 25px;
+        border: 1px solid #dde2eb;
+        border-radius: 3px;
+      }
+    }
+    .time-button {
+      padding: 0.5rem 0.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+      gap: 0.5rem;
+    }
+  }
+}

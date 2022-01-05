@@ -1,0 +1,16 @@
+.mep-pagination {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  background: whitesmoke;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  align-items: center;
+  height: 40px;
+  padding: 5px;
+  border-top: 2px solid #dee2e6;
+  .page-link {
+    box-shadow: none !important;
+  }
+}

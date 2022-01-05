@@ -1,0 +1,194 @@
+.mep-users-input {
+  max-width: 450px;
+  position: relative;
+  background-color: #fff;
+  .mep-dropdown-item {
+    position: absolute;
+    width: 100%;
+    background: white;
+    box-shadow: lightgrey 3px 3px 10px;
+    border-radius: 4px;
+    top: 40px;
+    display: none;
+    overflow: auto;
+    max-height: 250px;
+    z-index: 2;
+    &.show {
+      display: block;
+    }
+    ul {
+      margin: 0px;
+      padding: 0px;
+      list-style-type: none;
+    }
+  }
+  .mep-dropdown-input {
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    line-height: 22px;
+    width: 200px;
+    font-weight: normal;
+    border: 1px solid #dde2eb;
+    border-radius: 4px;
+    &.is-hover {
+      box-shadow: 0 0 0 1px #dde2eb !important;
+    }
+    label {
+      position: absolute;
+      font-size: 11px;
+      top: -7px;
+      left: 5px;
+      height: 12px;
+      display: flex;
+      align-items: center;
+      color: black;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      background: white;
+      padding: 0 5px;
+    }
+  }
+  .mep-user-tags {
+    display: flex;
+    width: 100%;
+    line-height: 1em;
+    margin-bottom: 0;
+  }
+  .mep-user-tag {
+    &.single {
+      width: 100%;
+    }
+    &:not(.single) {
+      background-color: #dde2eb;
+      font-weight: 600;
+      padding-left: 5px;
+      height: 20px;
+      margin-bottom: 0px;
+      margin-top: 5px;
+    }
+    display: flex;
+    margin: 2px;
+    color: #1f2126;
+    border-radius: 3px;
+    font-size: 14px;
+    height: 24px;
+    border: 2px solid transparent;
+    align-items: baseline;
+    cursor: pointer;
+    &:focus {
+      outline: none;
+    }
+    .mep-user-tag-center {
+      position: relative;
+      display: flex;
+      &.single {
+        width: 180px;
+      }
+      &:not(.single) {
+        max-width: 100px;
+      }
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-bottom: 1px;
+        font-size: 13px;
+      }
+    }
+    &.mep-invalid,
+    &.mep-user-tag.mep-deletion-mark {
+      border: 2px solid #db4646;
+      background-color: #f8dada;
+      .micon-close {
+        color: #db4646;
+      }
+    }
+    &.mep-user-tag.mep-max-user-reached {
+      background-color: #f8dada;
+      .micon-close {
+        color: #db4646;
+      }
+    }
+  }
+  .mep-user-input-wrapper {
+    display: flex;
+    flex: 1 0 auto;
+    padding: 0 5px;
+    font-size: 14px;
+    > div {
+      width: 100%;
+    }
+    input {
+      flex: 1 0 auto;
+      min-width: 100px;
+      border: none;
+      padding: 0px;
+      margin: 0px;
+      height: 28px;
+      cursor: pointer;
+    }
+  }
+  .mep-user-input {
+    line-height: initial;
+    &:focus {
+      outline: none;
+    }
+  }
+  .user-tag-actions {
+    &.single {
+      position: absolute;
+      right: 4px;
+      top: 9px;
+    }
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    margin-right: 2px;
+    i {
+      cursor: pointer;
+      font-size: 12px;
+      color: #8d9199;
+      &:hover {
+        color: red;
+      }
+    }
+  }
+  .select-mep-dropdown-item {
+    li {
+      font-size: 15px;
+      padding: 5px 10px !important;
+      position: relative;
+      line-height: 22px;
+      box-sizing: border-box;
+      padding: 0;
+      cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 13px;
+      &:hover {
+        background-color: #e7e7e7;
+      }
+      &.active:not(.disabled-options) {
+        background-color: #e7e7e7;
+      }
+      &.disabled-options span {
+        cursor: no-drop;
+        color: #b5bdc9;
+      }
+    }
+    div {
+      max-width: 180px;
+      display: flex;
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-bottom: 1px;
+        font-size: 13px;
+      }
+    }
+  }
+}
