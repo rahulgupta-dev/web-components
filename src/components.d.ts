@@ -11,6 +11,7 @@ export namespace Components {
         "disableFuture": boolean;
         "disablePast": boolean;
         "displayFormat": string;
+        "fillDefault": boolean;
         "fromName": string;
         "fromValue": any;
         "isRange": boolean;
@@ -22,54 +23,44 @@ export namespace Components {
         "timezone": string;
         "toName": string;
         "toValue": any;
-        "value": any;
-        "withTime": boolean;
-    }
-    interface MepDatepickerCopy {
-        "dataFormat": string;
-        "disableFuture": boolean;
-        "disablePast": boolean;
-        "displayFormat": string;
-        "fromName": string;
-        "fromValue": any;
-        "isRange": boolean;
-        "label": string;
-        "maxRange": number;
-        "name": string;
-        "placeholder": string;
-        "separator": string;
-        "timezone": string;
-        "toName": string;
-        "toValue": any;
+        "toggleErrorMsg": (msg: any) => Promise<void>;
         "value": any;
         "withTime": boolean;
     }
     interface MepDropdown {
+        "dependentListId": string;
         "filterPayload": any;
+        "isDependent": boolean;
         "items": string;
         "label": string;
         "listId": string;
+        "loadData": (filter?: any) => Promise<void>;
         "multiple": boolean;
         "name": string;
         "pageSize": number;
         "placeholder": string;
+        "resetData": () => Promise<void>;
         "searchable": boolean;
+        "toggleErrorMsg": (msg: any) => Promise<void>;
+        "value": string;
     }
     interface MepInput {
         "label": string;
         "name": string;
         "placeholder": string;
+        "toggleErrorMsg": (msg: any) => Promise<void>;
         "type": string;
         "value": string;
     }
     interface MepListing {
-        "filterData": (payload: any, firstCall: any) => Promise<void>;
+        "filterData": (payload: any, forceCall: any, togleFilter?: boolean) => Promise<void>;
         "filters": any;
         "listId": string;
         "pageSize": number;
         "url": string;
     }
     interface MepOperations {
+        "aclId": string;
         "label": string;
         "name": string;
         "operations": string;
@@ -87,12 +78,6 @@ declare global {
     var HTMLMepDatepickerElement: {
         prototype: HTMLMepDatepickerElement;
         new (): HTMLMepDatepickerElement;
-    };
-    interface HTMLMepDatepickerCopyElement extends Components.MepDatepickerCopy, HTMLStencilElement {
-    }
-    var HTMLMepDatepickerCopyElement: {
-        prototype: HTMLMepDatepickerCopyElement;
-        new (): HTMLMepDatepickerCopyElement;
     };
     interface HTMLMepDropdownElement extends Components.MepDropdown, HTMLStencilElement {
     }
@@ -126,7 +111,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "mep-datepicker": HTMLMepDatepickerElement;
-        "mep-datepicker-copy": HTMLMepDatepickerCopyElement;
         "mep-dropdown": HTMLMepDropdownElement;
         "mep-input": HTMLMepInputElement;
         "mep-listing": HTMLMepListingElement;
@@ -140,25 +124,7 @@ declare namespace LocalJSX {
         "disableFuture"?: boolean;
         "disablePast"?: boolean;
         "displayFormat"?: string;
-        "fromName"?: string;
-        "fromValue"?: any;
-        "isRange"?: boolean;
-        "label"?: string;
-        "maxRange"?: number;
-        "name"?: string;
-        "placeholder"?: string;
-        "separator"?: string;
-        "timezone"?: string;
-        "toName"?: string;
-        "toValue"?: any;
-        "value"?: any;
-        "withTime"?: boolean;
-    }
-    interface MepDatepickerCopy {
-        "dataFormat"?: string;
-        "disableFuture"?: boolean;
-        "disablePast"?: boolean;
-        "displayFormat"?: string;
+        "fillDefault"?: boolean;
         "fromName"?: string;
         "fromValue"?: any;
         "isRange"?: boolean;
@@ -174,7 +140,9 @@ declare namespace LocalJSX {
         "withTime"?: boolean;
     }
     interface MepDropdown {
+        "dependentListId"?: string;
         "filterPayload"?: any;
+        "isDependent"?: boolean;
         "items"?: string;
         "label"?: string;
         "listId"?: string;
@@ -183,6 +151,7 @@ declare namespace LocalJSX {
         "pageSize"?: number;
         "placeholder"?: string;
         "searchable"?: boolean;
+        "value"?: string;
     }
     interface MepInput {
         "label"?: string;
@@ -195,10 +164,12 @@ declare namespace LocalJSX {
         "filters"?: any;
         "listId"?: string;
         "onCell-click"?: (event: CustomEvent<any>) => void;
+        "onOn-load"?: (event: CustomEvent<any>) => void;
         "pageSize"?: number;
         "url"?: string;
     }
     interface MepOperations {
+        "aclId"?: string;
         "label"?: string;
         "name"?: string;
         "onPerform-operation"?: (event: CustomEvent<any>) => void;
@@ -213,7 +184,6 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "mep-datepicker": MepDatepicker;
-        "mep-datepicker-copy": MepDatepickerCopy;
         "mep-dropdown": MepDropdown;
         "mep-input": MepInput;
         "mep-listing": MepListing;
@@ -226,7 +196,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "mep-datepicker": LocalJSX.MepDatepicker & JSXBase.HTMLAttributes<HTMLMepDatepickerElement>;
-            "mep-datepicker-copy": LocalJSX.MepDatepickerCopy & JSXBase.HTMLAttributes<HTMLMepDatepickerCopyElement>;
             "mep-dropdown": LocalJSX.MepDropdown & JSXBase.HTMLAttributes<HTMLMepDropdownElement>;
             "mep-input": LocalJSX.MepInput & JSXBase.HTMLAttributes<HTMLMepInputElement>;
             "mep-listing": LocalJSX.MepListing & JSXBase.HTMLAttributes<HTMLMepListingElement>;

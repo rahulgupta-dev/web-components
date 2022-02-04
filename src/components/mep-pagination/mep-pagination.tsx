@@ -1,5 +1,5 @@
 import { Component, Event, EventEmitter, h, Prop } from '@stencil/core'
-
+import { i18n } from '../../i18n/translator'
 @Component({
   tag: 'mep-pagination',
   styleUrl: 'mep-pagination.scss'
@@ -79,31 +79,33 @@ export class MepPagination {
     return (
       <div class="mep-pagination">
         <div>Total Records: {this.totalCount}</div>
-        <nav aria-label="Page navigation">
-          <ul class="pagination" id="pagination">
-            <li class={`page-item first ${this.isInFirstPage && 'disabled'}`}>
-              <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 1)}>First</a>
-            </li>
-            <li class={`page-item prev ${this.isInFirstPage && 'disabled'}`}>
-              <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 'PREV')}>Previous</a>
-            </li>
-            {
-              this.pages.map(p =>
-                <li class={`page-item ${this.currentPage === p && 'active'}`}>
-                  <a href="#"
-                    class={`page-link mx-branding-background-action ${this.currentPage == p && 'mx-branding-background important'}`}
-                    onClick={this.pageChangeHandler.bind(this, p)}>{p}</a>
-                </li>
-              )
-            }
-            <li class={`page-item next ${this.isInLastPage && 'disabled'}`}>
-              <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 'NEXT')}>Next</a>
-            </li>
-            <li class={`page-item last ${this.isInLastPage && 'disabled'}`}>
-              <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, this.totalPages)}>Last</a>
-            </li>
-          </ul>
-        </nav>
+        {this.totalPages > 1 &&
+          <nav aria-label="Page navigation">
+            <ul class="pagination" id="pagination">
+              <li class={`page-item first ${this.isInFirstPage && 'disabled'}`}>
+                <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 1)} data-i18n="next">{i18n['first']}</a>
+              </li>
+              <li class={`page-item prev ${this.isInFirstPage && 'disabled'}`}>
+                <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 'PREV')} data-i18n="next">{i18n['previous']}</a>
+              </li>
+              {
+                this.pages.map(p =>
+                  <li class={`page-item ${this.currentPage === p && 'active'}`}>
+                    <a href="#"
+                      class={`page-link mx-branding-background-action ${this.currentPage == p && 'mx-branding-background important'}`}
+                      onClick={this.pageChangeHandler.bind(this, p)}>{p}</a>
+                  </li>
+                )
+              }
+              <li class={`page-item next ${this.isInLastPage && 'disabled'}`}>
+                <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, 'NEXT')} data-i18n="next">{i18n['next']}</a>
+              </li>
+              <li class={`page-item last ${this.isInLastPage && 'disabled'}`}>
+                <a href="#" class="page-link" onClick={this.pageChangeHandler.bind(this, this.totalPages)} data-i18n="next">{i18n['last']}</a>
+              </li>
+            </ul>
+          </nav>
+        }
       </div>
     )
   }

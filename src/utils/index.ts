@@ -75,7 +75,7 @@ export class Util {
       scriptContent += `
     cell = document.createElement('td');
     ${columnContent}
-    cellHtml.addEventListener('click', (event) => {
+    cellHtml.addEventListener('click', function(event){
       if(['action','link','info'].includes('${col.type}') && ${!col.operations}){
         callback.call(this, item, ${JSON.stringify(col)}, event);
       }
@@ -92,7 +92,7 @@ export class Util {
     let content = `cellHtml = document.createElement('div');`
     content += `cellHtml.classList.add('table-cell');`
     content += `cellHtml.classList.add('${col.type || 'text'}');`
-    content += `cellHtml.style='--cellWidth: ${col.width || '100px'}';`
+    content += `cellHtml.style.width='${col.width || '100px'}';`
     switch (col.type) {
       case 'link':
         content += `anchor = document.createElement('a');`
@@ -109,7 +109,10 @@ export class Util {
         } else {
           content += `div = document.createElement('mep-operations');`
           content += `div.setAttribute('operations', '${JSON.stringify(col.operations)}');`
-          content += `div.addEventListener('perform-operation', (event)=>{
+          if (col.aclId) {
+            content += `div.setAttribute('acl-id', '${col.aclId}');`
+          }
+          content += `div.addEventListener('perform-operation', function(event){
           event.stopPropagation();
           callback.call(this, item, event.detail, event);
         });`
@@ -141,6 +144,10 @@ export class Util {
       case 'img':
         content += `span = document.createElement('img');`
         content += `span.src= getByPath(item, '${col.path}');`
+        content += `cellHtml.appendChild(span);`
+        break
+      case 'custom':
+        content += `span = window['${col.pathFun}'](item, ${JSON.stringify(col)});`
         content += `cellHtml.appendChild(span);`
         break
       default:

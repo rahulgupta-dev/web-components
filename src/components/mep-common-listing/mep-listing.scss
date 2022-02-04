@@ -1,3 +1,21 @@
+@mixin grid_column {
+  $row: 1;
+  $col: 1;
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) {
+      -ms-grid-column: #{$col};
+      grid-column: #{$col};
+      grid-row: #{$row};
+      -ms-grid-row: #{$row};
+      margin-top: 15px;
+      $col: $col + 1;
+      @if $i%3 == 0 {
+        $row: $row + 1;
+        $col: 1;
+      }
+    }
+  }
+}
 .mep-listing {
   position: relative;
   .filter {
@@ -12,20 +30,39 @@
     padding: 0 10px;
     flex-direction: row-reverse;
     width: calc(100% + 8px);
+    &:empty {
+      display: none !important;
+    }
     .filter-footer,
     [slot="footer"] {
       display: flex;
-      justify-content: right;
+      justify-content: flex-end;
       margin-top: 15px;
-      gap: 15px;
+      .error-msg {
+        background: #ffc107;
+        border-radius: 5px;
+        font-size: 12px;
+        padding: 0.25rem 0.5rem;
+        width: 200px;
+        transition: 0.5s ease-in-out;
+        margin-right: 15px;
+        text-align: center;
+        opacity: 1;
+        &:empty {
+          opacity: 0;
+        }
+      }
     }
     [slot="content"],
     .filter-grid {
       display: grid;
+      display: -ms-grid;
+      -ms-grid-columns: 215px 215px 200px;
       grid-template-columns: 1fr 1fr 1fr;
-      row-gap: 15px;
       column-gap: 15px;
-      margin-top: 15px;
+      .grid-column {
+        @include grid_column;
+      }
     }
     .table-title {
       width: 100%;
@@ -78,10 +115,12 @@
       &.open {
         span {
           &:nth-child(2) {
+            z-index: 2;
             top: 7px;
             transform: rotate(-45deg) scale(1);
           }
           &:nth-child(3) {
+            z-index: 2;
             bottom: 16px;
             transform: rotate(45deg) scale(1);
           }
@@ -117,6 +156,7 @@
     .mep-filter-content {
       z-index: 1;
       top: 0;
+      right: 0;
       position: absolute;
       background-color: white;
       box-shadow: 0px -2px 4px 0px rgb(0 0 0 / 4%), 0px 4px 6px 0px rgb(31 33 38 / 12%);
@@ -133,6 +173,7 @@
   .list-container {
     width: 100%;
     background: white;
+    overflow: auto;
   }
   table {
     text-align: left;
@@ -171,15 +212,32 @@
         }
       }
       .no-data-found {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        background: transparent;
+        background: none !important;
+        border: none !important;
+        > td {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          background: transparent;
+        }
+      }
+    }
+  }
+  @media all and (-ms-high-contrast: none) {
+    /* IE11 */
+    .list-container {
+      table {
+        height: auto;
+        td:first-child,
+        th:first-child {
+          > div {
+            margin-left: 15px;
+          }
+        }
       }
     }
   }
   .table-cell {
-    width: var(--cellWidth);
     text-align: start;
     padding: 5px 0;
     height: 35px;
@@ -199,10 +257,10 @@
     }
   }
   .table-header {
-    width: var(--cellWidth);
     text-align: start;
-    padding: 15px 0;
+    padding: 14px 0;
     margin-right: 15px;
+    display: flex;
   }
 
   .filter-btn {

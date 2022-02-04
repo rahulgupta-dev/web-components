@@ -1,6 +1,8 @@
 import { Component, Element, Event, EventEmitter, h, Prop, State } from '@stencil/core'
 import { ClickOutside } from 'stencil-click-outside'
 import { Util } from '../../utils'
+import { i18n } from '../../i18n/translator'
+import { ACLMap } from '../../service'
 @Component({
   tag: 'mep-operations',
   styleUrl: 'mep-operations.scss'
@@ -12,6 +14,7 @@ export class MepOperations {
   @Prop() name: string
   @Prop() operations: string
   @Prop() label: string
+  @Prop({ attribute: 'acl-id' }) aclId: string
 
   @State() isOpen: boolean = false
   @State() top: number
@@ -28,6 +31,12 @@ export class MepOperations {
 
   get ulStyle() {
     return { top: `${this.top}px`, left: `${this.left}px`, position: 'fixed' }
+  }
+
+  get operationList() {
+    return JSON.parse(this.operations).filter(op => {
+      return !op.aclIds || op.aclIds.some(id => ACLMap[id])
+    })
   }
 
   @ClickOutside()
@@ -78,7 +87,6 @@ export class MepOperations {
   }
 
   render() {
-    const opList = JSON.parse(this.operations)
     return (
       <div class={`mep-operations ${this.isOpen ? 'open' : ''}`} onClick={this.openClose.bind(this)} >
         <div>
@@ -87,9 +95,9 @@ export class MepOperations {
             <span class="more-dot"></span>
             <span class="more-dot"></span>
           </button>
-          <ul style={this.ulStyle}>{opList.map(op => <li onClick={this.cellClickEvent.emit.bind(this, op)}>
+          <ul style={this.ulStyle}>{this.operationList.map(op => <li onClick={this.cellClickEvent.emit.bind(this, op)}>
             {op.icon && <i class={`${op.icon} mx-branding-text`}></i>}
-            <span class="ellipsify-title">{op.text}</span></li>
+            <span class="ellipsify-title" data-i18n={op.label}>{i18n[op.label]}</span></li>
           )}</ul>
         </div>
       </ div>

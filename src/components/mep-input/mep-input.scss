@@ -1,4 +1,44 @@
 .mep-input {
+  &.is-error {
+    > input {
+      border-color: red !important;
+    }
+    &:after {
+      display: flex;
+      justify-content: center;
+      background: #ffc107;
+      border-radius: 5px;
+      font-size: 12px;
+      padding: 5px;
+      width: 100%;
+      position: absolute;
+      bottom: 35px;
+      opacity: 0;
+      transition: 0.5s ease-in-out;
+      content: attr(data-error-msg);
+      cursor: default;
+      z-index: 2;
+    }
+    &:before {
+      border: solid;
+      border-color: #ffc107 transparent;
+      border-width: 12px 6px 0 6px;
+      content: "";
+      left: 15px;
+      bottom: 25px;
+      position: absolute;
+      opacity: 0;
+      transition: 0.5s ease-in-out;
+      cursor: default;
+      z-index: 2;
+    }
+    &.is-error:hover {
+      &:after,
+      &:before {
+        opacity: 1;
+      }
+    }
+  }
   display: flex;
   align-items: center;
   gap: 10px;

@@ -8,9 +8,9 @@
   "main": "./dist/index.cjs.js",
   "scripts": {
     "start": "stencil build --dev --watch --serve",
-    "build": "stencil build --prod && node ./src/tasks/after.build.js",
+    "build": "stencil build --dev && node ./src/tasks/after.build.js",
     "server": "json-server --watch db.json",
-    "task": "node ./src/tasks/someTask.js"
+    "task": "node ./src/tasks/after.build.js"
   },
   "keywords": [],
   "author": "",

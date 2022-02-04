@@ -4,7 +4,8 @@ let loadingPromise = Promise.resolve({})
 declare let csrfReqToken: any
 
 export class Ajax {
-
+  static RESPONSE_SUCCESS = 'RESPONSE_SUCCESS'
+  static RESPONSE_FAILED = 'RESPONSE_FAILED'
   static get(url: string, opts: any = {}): Promise<any> {
     opts.method = 'get'
     return Ajax.send(url, null, opts)
