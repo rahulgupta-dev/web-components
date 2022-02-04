@@ -1,8 +1,8 @@
-import { Component, Element, h, Prop, State } from '@stencil/core'
+import { Component, Element, h, Method, Prop, State, Watch } from '@stencil/core'
 import { ClickOutside } from 'stencil-click-outside'
 import { debounce } from '../../decorators/common'
-import ServiceController from '../../service'
-
+import { ServiceController } from '../../service'
+import { i18n } from '../../i18n/translator'
 @Component({
   tag: 'mep-dropdown',
   styleUrl: 'mep-dropdown.scss',
@@ -19,7 +19,10 @@ export class MepDropdown {
   @Prop() placeholder: string
   @Prop() multiple: boolean = false
   @Prop() items: string
-  @Prop() searchable: boolean = true
+  @Prop() searchable: boolean = false
+  @Prop({ mutable: true }) value: string
+  @Prop({ attribute: 'dependent-list-id' }) dependentListId: string
+  @Prop({ attribute: 'is-dependent' }) isDependent: boolean = false
 
   @State() searchText: string = ''
   @State() data: Array<any> = []
@@ -29,26 +32,72 @@ export class MepDropdown {
   @State() arrowCounter: number = -1
   @State() showList: boolean = false
   @State() isHover: boolean = false
+  @State() errorMsg: string
 
+  dependentDropDown: MepDropdown
   lastSelected
   deletionMarkTime
+  recentItems = {}
   componentDidLoad() {
     this.$el.querySelector(`[name=${this.name}]`).addEventListener('value-changed', (event: CustomEvent) => {
       if (!event.detail.value) {
         this.selectedItems = []
+        this.value = ''
+        if (this.dependentDropDown && !this.value) {
+          this.dependentDropDown.resetData()
+        }
+      } else {
+        let newItems = []
+        event.detail.value.split(',').forEach(key => {
+          newItems.push(this.recentItems[key])
+        })
+        this.selectedItems = newItems
       }
     })
+    if (this.dependentListId) {
+      this.dependentDropDown = document.querySelector(`[list-id=${this.dependentListId}]`) as any
+    }
   }
   componentWillLoad() {
     if (this.items) {
       this.data = JSON.parse(this.items)
-    } else {
+    } else if (!this.isDependent) {
       this.loadData()
     }
   }
 
+  @Watch('data')
+  watchData() {
+    if (this.value) {
+      let val = this.data.find(d => d.key === this.value)
+      if (val) {
+        this.recentItems[this.value] = val
+        this.selectedItems = [val]
+      }
+    }
+  }
+  @Watch('selectedItems')
+  watchSelectedItems() {
+    this.errorMsg = ''
+  }
+
+  @Method()
+  async toggleErrorMsg(msg) {
+    this.errorMsg = msg
+  }
+  @Method()
+  async resetData() {
+    this.selectedItems = []
+    this.data = []
+  }
+  @Method()
   @debounce(500)
-  private loadData() {
+  async loadData(filter = null) {
+    if (filter) {
+      this.data = []
+      this.selectedItems = []
+      this.filterPayload = JSON.stringify(filter)
+    }
     this.isLoading = true
     ServiceController.fetchDropdwonData(
       {
@@ -71,6 +120,9 @@ export class MepDropdown {
         elem.setAttribute('title', elem.textContent)
       }
     })
+    if (!this.data.length && !this.isDependent) {
+      this.loadData()
+    }
   }
   get normalizedData() {
     return this.data.filter(item => item.value.toLowerCase().includes(this.searchText) && !this.selectedItems.some(s => s.key === item.key))
@@ -80,9 +132,6 @@ export class MepDropdown {
   showHide(value) {
     this.showList = value
     this.onHover(value)
-    // if (!this.showList) {
-    //   this.loadData()
-    // }
   }
   onHover(value) {
     this.isHover = value
@@ -91,15 +140,27 @@ export class MepDropdown {
     this.searchText = ''
     if (this.multiple) {
       const { x, y } = this.$el.querySelector('.mep-user-input-wrapper').getBoundingClientRect()
-      this.$el.querySelector('.mep-dropdown-input').scrollBy(x, y)
+      if (this.$el.querySelector('.mep-dropdown-input').scrollBy) {
+        this.$el.querySelector('.mep-dropdown-input').scrollBy(x, y)
+      } else {
+        this.$el.querySelector('.mep-dropdown-input').scrollTop = x
+        this.$el.querySelector('.mep-dropdown-input').scrollLeft = y
+      }
       this.selectedItems = [...this.selectedItems, item]
     } else {
       this.selectedItems = [item]
     }
+    this.recentItems = this.selectedItems.reduce((acc, cur) => {
+      acc[cur.key] = cur
+      return acc
+    }, {})
     this.showHide(false)
+    if (this.dependentDropDown) {
+      this.dependentDropDown.loadData({ query: this.selectedValue })
+    }
   }
   get selectedValue() {
-    return this.selectedItems.map(item => item.key).join(',')
+    return this.selectedItems.map(item => item.key).join(',') || this.value
   }
   removeItem(item) {
     this.selectedItems = this.selectedItems.filter(i => i.key !== item.key)
@@ -108,6 +169,10 @@ export class MepDropdown {
     this.arrowCounter = -1
     const hiddenElement = this.$el.querySelector(`[name=${this.name}]`) as HTMLInputElement
     hiddenElement.value = this.selectedItems.map(item => item.value).join(',')
+    this.value = hiddenElement.value
+    if (this.dependentDropDown && !this.value) {
+      this.dependentDropDown.resetData()
+    }
   }
   keyDown(event) {
     if (this.selectedItems.length < 11) {
@@ -186,7 +251,8 @@ export class MepDropdown {
             <input
               type="text"
               class="mep-user-input"
-              placeholder={this.placeholder}
+              data-i18n={this.placeholder}
+              placeholder={i18n[this.placeholder]}
               value={this.searchText}
               onInput={this.handleInput.bind(this)}
               onFocus={this.showHide.bind(this, true)}
@@ -212,7 +278,8 @@ export class MepDropdown {
           <input
             type="text"
             class="mep-user-input"
-            placeholder={this.placeholder}
+            data-i18n={this.placeholder}
+            placeholder={i18n[this.placeholder]}
             value={this.searchText}
             onInput={this.handleInput.bind(this)}
             onFocus={this.showHide.bind(this, true)}
@@ -228,9 +295,12 @@ export class MepDropdown {
       </li>
     })
     return (
-      <div class="mep-users-input" onMouseOver={this.onHover.bind(this, true)} onMouseOut={this.onHover.bind(this, false)}>
+      <div class={this.errorMsg ? "mep-users-input is-error" : "mep-users-input"}
+        data-error-msg={this.errorMsg}
+        onMouseOver={this.onHover.bind(this, true)}
+        onMouseOut={this.onHover.bind(this, false)}>
         <div class={this.showList || this.isHover ? "mx-branding-border mep-dropdown-input important" : "mep-dropdown-input"}>
-          {this.label && this.selectedValue ? <label>{this.label}</label> : ''}
+          {this.label && this.selectedValue ? <label data-i18n={this.label}>{i18n[this.label]}</label> : ''}
           {this.multiple ? multiInput : singleInput}
         </div>
         <div class={this.showList ? "show mep-dropdown-item" : "mep-dropdown-item"}>

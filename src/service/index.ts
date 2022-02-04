@@ -1,3 +1,3 @@
-import { ServiceController } from './service'
+import { ServiceController, ACLMap } from './service'
 
-export default ServiceController
+export { ServiceController, ACLMap }

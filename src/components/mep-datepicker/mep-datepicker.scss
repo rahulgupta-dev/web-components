@@ -1,3 +1,20 @@
+@mixin week_columns {
+  $row: 1;
+  $col: 1;
+  @for $i from 1 through 50 {
+    &:nth-child(#{$i}) {
+      -ms-grid-column: #{$col};
+      grid-column: #{$col};
+      grid-row: #{$row};
+      -ms-grid-row: #{$row};
+      $col: $col + 1;
+      @if $i%7 == 0 {
+        $row: $row + 1;
+        $col: 1;
+      }
+    }
+  }
+}
 .mep-date-content {
   width: 200px;
   &.with-time {
@@ -19,14 +36,11 @@
   .clear-icon {
     position: absolute;
     cursor: pointer;
-    right: 5px;
-    top: 9px;
+    right: 0;
+    top: 10px;
     width: 12px;
     height: 12px;
     opacity: 0.2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     &:hover {
       opacity: 0.5;
     }
@@ -59,12 +73,58 @@
     background: white;
     padding: 0 5px;
   }
+
+  &.is-error {
+    > input {
+      border-color: red !important;
+    }
+    &:after {
+      display: flex;
+      justify-content: center;
+      background: #ffc107;
+      border-radius: 5px;
+      font-size: 12px;
+      padding: 5px;
+      width: 100%;
+      position: absolute;
+      bottom: 35px;
+      opacity: 0;
+      transition: 0.5s ease-in-out;
+      content: attr(data-error-msg);
+      cursor: default;
+      z-index: 2;
+    }
+    &:before {
+      border: solid;
+      border-color: #ffc107 transparent;
+      border-width: 12px 6px 0 6px;
+      content: "";
+      left: 15px;
+      bottom: 25px;
+      position: absolute;
+      opacity: 0;
+      transition: 0.5s ease-in-out;
+      cursor: default;
+      z-index: 2;
+    }
+    &.is-error:hover {
+      &:after,
+      &:before {
+        opacity: 1;
+      }
+    }
+  }
 }
 .mep-datepicker {
   .mep-dates,
   .mep-week-name {
     display: grid;
+    display: -ms-grid;
+    -ms-grid-columns: 35px 35px 35px 35px 35px 35px 35px;
     grid-template-columns: repeat(7, 35px [col-start]);
+    .week-day {
+      @include week_columns;
+    }
   }
   display: none;
   padding: 0.5rem;
@@ -75,10 +135,13 @@
   z-index: 999;
   &.show {
     display: grid;
+    display: -ms-grid;
     &.is-range {
+      -ms-grid-columns: 1fr 1fr;
       grid-template-columns: 1fr 1fr;
     }
     &:not(.is-range) {
+      -ms-grid-columns: 1fr;
       grid-template-columns: 1fr;
     }
   }
@@ -113,13 +176,29 @@
     }
   }
   .mep-current-month {
+    display: -ms-grid;
+    -ms-grid-columns: 35px 1fr 35px;
     display: grid;
     grid-template-columns: 35px 1fr 35px;
     align-items: center;
+    :nth-child(1) {
+      -ms-grid-column: 1;
+      grid-column: 1;
+    }
+    :nth-child(2) {
+      -ms-grid-column: 2;
+      grid-column: 2;
+    }
+    :nth-child(3) {
+      -ms-grid-column: 3;
+      grid-column: 3;
+    }
     .arrow {
       height: 0;
       width: 0;
       display: inline-block;
+      position: absolute;
+      top: 16px;
       cursor: pointer;
       border: 6px solid gray;
       &.left {

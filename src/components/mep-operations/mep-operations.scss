@@ -68,7 +68,9 @@
         text-overflow: ellipsis;
         //max-width: 150px;
         min-width: 150px;
-        gap: 15px;
+        > span {
+          margin-left: 15px;
+        }
         &:hover {
           background-color: #e7e7e7;
         }

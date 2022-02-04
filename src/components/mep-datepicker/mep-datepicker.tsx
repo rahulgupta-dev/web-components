@@ -1,6 +1,7 @@
-import { Component, Element, h, Prop, State } from '@stencil/core'
+import { Component, Element, h, Method, Prop, State, Watch } from '@stencil/core'
 import { ClickOutside } from 'stencil-click-outside'
 import moment from 'moment-timezone'
+import { i18n } from '../../i18n/translator'
 
 //https://momentjs.com/docs/#/displaying/format/
 
@@ -16,24 +17,26 @@ export class MepDatepicker {
   @Prop() label: string
   @Prop({ attribute: 'from-name' }) fromName: string
   @Prop({ attribute: 'to-name' }) toName: string
-  @Prop() placeholder: string = 'Select Date...'
+  @Prop() placeholder: string = 'select_date_ellipsis'
   @Prop({ attribute: 'timezone' }) timezone: string = moment.tz.guess()
   @Prop({ attribute: 'disp-format' }) displayFormat: string = 'DD-MMM-YYYY'
   @Prop({ attribute: 'data-format' }) dataFormat: string = 'x'
   @Prop({ mutable: true }) value: any
-  @Prop({ attribute: 'from-value' }) fromValue: any
-  @Prop({ attribute: 'to-value' }) toValue: any
+  @Prop({ attribute: 'from-value', mutable: true }) fromValue: any
+  @Prop({ attribute: 'to-value', mutable: true }) toValue: any
   @Prop({ attribute: 'is-range' }) isRange: boolean = false
   @Prop() separator: string = ' - '
   @Prop({ attribute: 'disable-past' }) disablePast: boolean = false
   @Prop({ attribute: 'disable-future' }) disableFuture: boolean = false
   @Prop({ attribute: 'max-range' }) maxRange: number
+  @Prop({ attribute: 'fill-default' }) fillDefault: boolean = false
   @Prop({ attribute: 'with-time' }) withTime: boolean = false
 
   @State() showPicker: boolean = false
   @State() dateValue: any = null
   @State() selectedDates: any = []
   @State() hoverItem: any = {}
+  @State() errorMsg: string
 
   fromHour: HTMLSelectElement
   fromMin: HTMLSelectElement
@@ -44,29 +47,28 @@ export class MepDatepicker {
 
   componentWillLoad() {
     if (this.isRange) {
-      const fromVal = this.value && !isNaN(this.fromValue) ? parseInt(this.fromValue) : this.fromValue
-      const toVal = this.toValue && !isNaN(this.toValue) ? parseInt(this.toValue) : this.toValue
+      const fromVal = this.value && !isNaN(this.fromValue) ? parseFloat(this.fromValue) : this.fromValue
+      const toVal = this.toValue && !isNaN(this.toValue) ? parseFloat(this.toValue) : this.toValue
       this.dateValue = fromVal ? moment(fromVal, this.dataFormat) : null
       if (fromVal && toVal) {
         this.selectedDates.push(moment(fromVal, this.dataFormat))
         this.selectedDates.push(moment(toVal, this.dataFormat))
+      } else if (this.fillDefault) {
+        let today = moment(this.today)
+        today.subtract(this.maxRange || 30, 'day')
+        this.selectedDates.push(moment(today, this.dataFormat))
+        this.selectedDates.push(moment(this.today, this.dataFormat))
       }
     } else {
-      this.value = this.value && !isNaN(this.value) ? parseInt(this.value) : this.value
+      this.value = this.value && !isNaN(this.value) ? parseFloat(this.value) : this.fillDefault ? this.today : this.value
       this.dateValue = this.value ? moment(this.value, this.dataFormat) : null
       this.selectedDates = [this.dateValue]
     }
   }
   componentDidLoad() {
-    const eventClear = (event: CustomEvent) => {
-      if (!event.detail.value) {
-        this.selectedDates = []
-        this.dateValue = null
-      }
-    }
-    this.name && this.$el.querySelector(`[name=${this.name}]`).addEventListener('value-changed', eventClear)
-    !this.name && this.fromName && this.$el.querySelector(`[name=${this.fromName}]`).addEventListener('value-changed', eventClear)
-    !this.name && this.toName && this.$el.querySelector(`[name=${this.toName}]`).addEventListener('value-changed', eventClear)
+    this.name && this.$el.querySelector(`[name=${this.name}]`).addEventListener('value-changed', this.onValueChange.bind(this))
+    !this.name && this.fromName && this.$el.querySelector(`[name=${this.fromName}]`).addEventListener('value-changed', this.onValueChange.bind(this))
+    !this.name && this.toName && this.$el.querySelector(`[name=${this.toName}]`).addEventListener('value-changed', this.onValueChange.bind(this))
     if (this.withTime) {
       if (this.isRange) {
         this.fromHour.value = this.selectedDates[0].format('hh')
@@ -83,7 +85,37 @@ export class MepDatepicker {
     }
   }
 
+  @Method()
+  async toggleErrorMsg(msg) {
+    this.errorMsg = msg
+  }
 
+  @Watch('selectedDates')
+  watchSelectedDates() {
+    this.errorMsg = ''
+  }
+  
+  private onValueChange(event: CustomEvent) {
+    event.stopPropagation()
+    if (!event.detail.value) {
+      this.selectedDates = []
+      this.dateValue = null
+    } else {
+      if (this.isRange) {
+        let newDates = [...this.selectedDates]
+        if (this.fromName === event.detail.name) {
+          newDates[0] = moment(parseFloat(event.detail.value))
+        }
+        if (this.toName === event.detail.name) {
+          newDates[1] = moment(parseFloat(event.detail.value))
+        }
+        this.selectedDates = newDates
+      } else {
+        this.selectedDates = [moment(parseFloat(event.detail.value))]
+      }
+      this.dateValue = this.selectedDates[0]
+    }
+  }
   get today() {
     return moment(moment.now()).tz(this.timezone)
   }
@@ -145,7 +177,7 @@ export class MepDatepicker {
 
   get fromHour24Value() {
     if (this.fromAMPM.value === 'PM') {
-      const val = parseInt(this.fromHour.value) + 12
+      const val = parseFloat(this.fromHour.value) + 12
       return val === 24 ? '00' : val
     } else {
       return this.fromHour.value
@@ -154,7 +186,7 @@ export class MepDatepicker {
 
   get toHour24Value() {
     if (this.toAMPM.value === 'PM') {
-      const val = parseInt(this.toHour.value) + 12
+      const val = parseFloat(this.toHour.value) + 12
       return val === 24 ? '00' : val
     } else {
       return this.toHour.value
@@ -181,13 +213,15 @@ export class MepDatepicker {
   clearSelection(event) {
     event.stopPropagation()
     this.selectedDates = []
-    this.fromHour.value = '01'
-    this.fromMin.value = '00'
-    this.fromAMPM.value = 'AM'
-    this.toHour.value = '01'
-    this.toMin.value = '00'
-    this.toAMPM.value = 'AM'
     this.dateValue = null
+    if (this.withTime) {
+      this.fromHour.value = '01'
+      this.fromMin.value = '00'
+      this.fromAMPM.value = 'AM'
+      this.toHour.value = '01'
+      this.toMin.value = '00'
+      this.toAMPM.value = 'AM'
+    }
   }
   selectDate(date) {
     if (!date.isDisabled) {
@@ -311,17 +345,17 @@ export class MepDatepicker {
     const daysOfMonth = type === 'FROM' ? this.fromDaysOfMonth : this.toDaysOfMonth
     return <div>
       <div class="mep-week-name">
-        <span class="day" >SUN</span>
-        <span class="day" >MON</span>
-        <span class="day" >TUE</span>
-        <span class="day" >WED</span>
-        <span class="day" >THU</span>
-        <span class="day" >FRI</span>
-        <span class="day" >SAT</span>
+        <span class="day week-day" data-i18n="week_sun">{i18n["week_sun"]}</span>
+        <span class="day week-day" data-i18n="week_mon">{i18n["week_mon"]}</span>
+        <span class="day week-day" data-i18n="week_tue">{i18n["week_tue"]}</span>
+        <span class="day week-day" data-i18n="week_wed">{i18n["week_wed"]}</span>
+        <span class="day week-day" data-i18n="week_thu">{i18n["week_thu"]}</span>
+        <span class="day week-day" data-i18n="week_fri">{i18n["week_fri"]}</span>
+        <span class="day week-day" data-i18n="week_sat">{i18n["week_sat"]}</span>
       </div>
       <div class="mep-dates">
         {daysOfMonth.map(d => {
-          let dateCls = ''
+          let dateCls = 'week-day '
           if (d.date) {
             if (d.isDisabled) {
               dateCls += 'disabled'
@@ -348,9 +382,11 @@ export class MepDatepicker {
   render() {
     return (
       <div>
-        <div onClick={this.showHide.bind(this)} class={`mep-date-content ${this.withTime && 'with-time'}`}>
-          {this.label && this.selectedValues.length && <label>{this.label}</label>}
-          <input readOnly type="text" title={this.displayDate} value={this.displayDate} class="mx-branding-border-action" placeholder={this.placeholder} />
+        <div onClick={this.showHide.bind(this)}
+          data-error-msg={this.errorMsg}
+          class={`mep-date-content ${this.errorMsg && 'is-error'} ${this.withTime && 'with-time'}`}>
+          {this.label && this.selectedValues.length ? <label data-i18n={this.label}>{i18n[this.label]}</label> : ''}
+          <input readOnly type="text" title={this.displayDate} value={this.displayDate} class="mx-branding-border-action" data-i18n={this.placeholder} placeholder={i18n[this.placeholder]} />
           <i class="clear-icon" onClick={this.clearSelection.bind(this)} />
           {this.name ?
             <input type="hidden" name={this.name} value={this.selectedValues.join(this.separator)} /> :
@@ -361,7 +397,7 @@ export class MepDatepicker {
           }
         </div>
         <div class={this.showPicker ? `mep-datepicker show ${this.isRange && 'is-range'}` : "mep-datepicker"} >
-          <div>
+          <div style={{ "-ms-grid-column": "1" }} >
             <div class="mep-current-month">
               <i class="arrow left mx-branding-border-action important" onClick={this.changeMonth.bind(this, 'PREV')} />
               <span>{this.fromMonthYearDisplay}</span>
@@ -414,7 +450,7 @@ export class MepDatepicker {
             }
           </div>
           {
-            this.isRange && <div>
+            this.isRange && <div style={{ "-ms-grid-column": "2" }} >
               <div class="mep-current-month">
                 <span />
                 <span>{this.toMonthYearDisplay}</span>

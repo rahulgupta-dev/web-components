@@ -9,7 +9,22 @@ function copyFiles (item) {
     if (destFolder) {
       console.log(chalk.gray(`Copying ${item} to : `, destFolder))
       fs.copyFileSync(path.join(sourceFolder, item), path.join(destFolder, item))
-      resolve()
+      if (item === 'mep-components.js') {
+        fs.readFile(path.join(destFolder, item), 'utf8', function (err, data) {
+          if (err) {
+            return console.log(err)
+          }
+          let result = data.replace(/'use strict';/g, '')
+          result = result.replace(/"use strict";/g, '')
+          result = result.replace(/includes/g, 'including')
+          fs.writeFile(path.join(destFolder, item), result, 'utf8', function (err) {
+            if (err) return console.log(err)
+            resolve()
+          })
+        })
+      } else {
+        resolve()
+      }
     }
   })
 }
